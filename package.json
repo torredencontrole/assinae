@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "npm run build:extension",
     "build:extension": "node scripts/build-extension.mjs",
+    "package:extension": "node scripts/package-extension.mjs",
     "typecheck:extension": "tsc -p tsconfig.extension.json --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
