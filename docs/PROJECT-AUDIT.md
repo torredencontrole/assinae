@@ -4,15 +4,15 @@
 
 ### Manifesto
 
-O projeto utiliza Manifest V3. O script de conteúdo é carregado somente no WhatsApp Web e o popup é definido como `popup.html`.
+O projeto utiliza Manifest V3. O script de conteúdo é compilado a partir de `src/content.ts` e carregado somente no WhatsApp Web. O popup é definido como `popup.html` e carrega o script compilado em `src/popup.js` dentro do pacote `dist`.
 
 ### Configuração
 
-`popup.js` lê e grava a chave `signature` em `chrome.storage.sync` no modo de compatibilidade. A fonte moderna equivalente está em `src/popup.ts`.
+`src/popup.ts` lê e grava a chave `signature` em `chrome.storage.sync`. O build gera `src/popup.js` dentro de `dist` para execução pelo popup.
 
 ### Aplicação da assinatura
 
-`content.js` é mantido como compatibilidade para carregamento direto. A fonte moderna está em `src/content.ts` e preserva o mesmo comportamento: localizar o campo de composição do WhatsApp Web e adicionar a assinatura no formato:
+`src/content.ts` é a fonte do content script e preserva o comportamento validado: localizar o campo de composição do WhatsApp Web e adicionar a assinatura no formato:
 
 ```text
 *assinatura*
@@ -49,9 +49,9 @@ O campo `key` existente foi preservado para reduzir o risco de mudança de ident
 
 ### Linguagem e build
 
-A primeira estabilização manteve JavaScript na raiz para evitar impacto no fluxo funcional. A etapa atual adiciona TypeScript como fonte moderna para o content script e o popup, com `tsconfig.extension.json` e `scripts/build-extension.mjs` para gerar uma versão pronta em `dist/`.
+A modernização adicionou TypeScript como fonte para o content script e o popup, com `tsconfig.extension.json` e `scripts/build-extension.mjs` para gerar uma versão pronta em `dist/`.
 
-Essa estratégia permite testar o novo código sem remover imediatamente o caminho de compatibilidade que já funciona.
+Após a validação do build moderno, o manifesto e o popup passaram a apontar diretamente para os arquivos compilados, eliminando o caminho JavaScript legado na raiz do projeto.
 
 ## 3. Alterações da modernização
 
@@ -70,36 +70,43 @@ Essa estratégia permite testar o novo código sem remover imediatamente o camin
 - Feedback de sucesso/erro adicionado ao popup.
 - Links externos endurecidos com `noopener noreferrer`.
 - Fonte TypeScript adicionada para `content.ts` e `popup.ts`.
-- Pipeline de build da extensão adicionada.
+- Pipeline de build e empacotamento da extensão adicionado.
 - Branding genérico do template Vite removido.
+- Manifesto atualizado para usar `src/content.js` no pacote compilado.
+- Popup atualizado para usar `src/popup.js` no pacote compilado.
+- Arquivos JavaScript legados da raiz removidos.
 
 ## 4. O que não foi alterado propositalmente
 
 - O formato da assinatura.
 - A chave `signature` do armazenamento.
-- O uso de `chrome.storage.sync` nesta etapa.
+- O uso de `chrome.storage.sync`.
 - A identidade/ID da extensão.
 - O mecanismo de inserção baseado no DOM do WhatsApp Web.
-- Os arquivos JavaScript de compatibilidade usados no carregamento direto.
 
 ## 5. Plano de testes
 
 1. Executar `npm install`.
 2. Executar `npm run typecheck:extension`.
 3. Executar `npm run build`.
-4. Carregar a pasta `dist` como extensão descompactada.
-5. Configurar uma assinatura simples.
-6. Abrir uma conversa no WhatsApp Web.
-7. Digitar uma mensagem curta e verificar a assinatura.
-8. Editar uma mensagem antes do envio.
-9. Trocar de conversa sem recarregar o WhatsApp.
-10. Recarregar o WhatsApp Web.
-11. Reabrir o popup e confirmar a persistência da assinatura.
-12. Alterar a assinatura com o WhatsApp aberto e verificar a atualização.
-13. Testar assinatura vazia.
-14. Testar assinatura com caracteres acentuados, emojis e quebras de linha.
-15. Testar assinatura próxima do limite de 300 caracteres.
+4. Conferir o `dist/manifest.json` e confirmar `src/content.js` em `content_scripts`.
+5. Conferir o `dist/popup.html` e confirmar `src/popup.js`.
+6. Confirmar que `content.js` e `popup.js` não existem no pacote.
+7. Carregar a pasta `dist` como extensão descompactada.
+8. Configurar uma assinatura simples.
+9. Abrir uma conversa no WhatsApp Web.
+10. Digitar uma mensagem curta e verificar a assinatura.
+11. Editar uma mensagem antes do envio.
+12. Trocar de conversa sem recarregar o WhatsApp.
+13. Recarregar o WhatsApp Web.
+14. Reabrir o popup e confirmar a persistência da assinatura.
+15. Alterar a assinatura com o WhatsApp aberto e verificar a atualização.
+16. Testar assinatura vazia.
+17. Testar assinatura com caracteres acentuados, emojis e quebras de linha.
+18. Testar assinatura próxima do limite de 300 caracteres.
+19. Executar `npm run package:extension`.
+20. Validar o ZIP gerado.
 
-## 6. Próxima etapa
+## 6. Resultado da etapa
 
-Depois da validação funcional do build TypeScript, a próxima evolução pode remover gradualmente os arquivos JavaScript de compatibilidade e reduzir a dependência da base React/Vite que não participa do runtime da extensão.
+A arquitetura de execução da extensão passa a ter uma única fonte TypeScript e um único fluxo de build/distribuição. Os arquivos JavaScript de compatibilidade da raiz não participam mais do runtime e foram removidos somente após a validação da estrutura compilada.
