@@ -20,10 +20,10 @@
   "content_scripts": [
     {
       "matches": ["https://web.whatsapp.com/*"],
-      "js": ["content.js"],
+      "js": ["src/content.js"],
       "run_at": "document_idle"
     }
   ],
   "permissions": ["storage"],
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv/e/q3b15i2eBHhK/a93NfI1keAQrrd9FoqetWoFyTEutuaqOGpximo+QkQ9yHIy10e/LS4STxd0QjOHyggOBi8VhcFfxd3Z4tTC/Sd2G+hOFzmgt87SEcuPK9d/Hoetwl8TYrJ3bjudqfCy2IoXNbE/SlLv0DSKk4KaiNKYUwnhpnoH1OFJSud1nHSs0wz+FyiqWXX9BvOFDBqGJsQHwOghCoZgpYGCxtDq3B3PMfhna1Wj5pANQoGT8YrXmk5qeQLT+V0UhL12ms5nFK20mz/onGCvvfsOHAIixcqakSLaTxRpoTWQRpy6SQ39BgJjeH8NMxOMfldw/Ixt1ieeOwIDAQAB"
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv/e/q3b15i2eBHhK/a93NfI1keAQrrd9FoqetWoFyTEutuaqOGpximo+QkQ9yHIy10e/LS4STxd0QjOHyggOBi8VhcFfxd3Z4tTC/Sd2G+hOFzmgt87SEcuPK9d/Hoetwl8TYrJ3bjudqfCy2IoXNbE/SlLv0DSKk4KaiNKYUwnhpnoH1OFJSudn1HSs0wz+FyiqWXX9BvOFDBqGJsQHwOghCoZgpYGCxtDq3B3PMfhnaW1Wj5pANQoGT8YrXmk5qeQLT+V0UhL12ms5nFK20mz/onGCvvfsOHAIixcqakSLaTxRpoTWQRpy6SQ39BgJjeH8NMxOMfldw/Ixt1ieeOwIDAQAB"
 }

@@ -1,14 +1,26 @@
 (() => {
   'use strict';
 
+  type ChromeApi = typeof globalThis & {
+    chrome: {
+      storage: {
+        sync: {
+          get: (keys: string[], callback: (result: Record<string, unknown>) => void) => void;
+        };
+        onChanged: {
+          addListener: (callback: (changes: Record<string, { newValue?: unknown }>, areaName: string) => void) => void;
+        };
+      };
+    };
+  };
+
+  const extensionChrome = (globalThis as ChromeApi).chrome;
   let signature = '';
-  let boundComposer = null;
-  let lastProcessedText = null;
+  let boundComposer: HTMLElement | null = null;
+  let lastProcessedText: string | null = null;
   let processing = false;
 
-  function pasteText(element, text) {
-    if (!element) return;
-
+  function pasteText(element: HTMLElement, text: string): void {
     element.focus();
     deleteAll(element);
 
@@ -18,13 +30,11 @@
       clipboardData: new DataTransfer(),
     });
 
-    pasteEvent.clipboardData.setData('text', text);
+    pasteEvent.clipboardData?.setData('text', text);
     element.dispatchEvent(pasteEvent);
   }
 
-  function deleteAll(element) {
-    if (!element) return;
-
+  function deleteAll(element: HTMLElement): void {
     const isMac = navigator.userAgent.includes('Mac OS X');
 
     element.dispatchEvent(new KeyboardEvent('keydown', {
@@ -46,26 +56,24 @@
     }));
   }
 
-  function getComposer() {
-    return document.querySelector('footer div[role="textbox"]');
+  function getComposer(): HTMLElement | null {
+    return document.querySelector<HTMLElement>('footer div[role="textbox"]');
   }
 
-  function getComposerParagraph(composer) {
+  function getComposerParagraph(composer: HTMLElement | null): HTMLParagraphElement | null {
     if (!composer) return null;
 
     const paragraphs = composer.querySelectorAll('p');
     return paragraphs.length === 1 ? paragraphs[0] : null;
   }
 
-  function applySignature() {
+  function applySignature(): void {
     if (processing || !signature) return;
 
-    const composer = getComposer();
-    const paragraph = getComposerParagraph(composer);
-
+    const paragraph = getComposerParagraph(getComposer());
     if (!paragraph) return;
 
-    const text = paragraph.textContent || '';
+    const text = paragraph.textContent ?? '';
     if (!text || text === lastProcessedText) return;
 
     const formattedSignature = `*${signature}*`;
@@ -91,7 +99,7 @@
     }
   }
 
-  function bindComposer() {
+  function bindComposer(): void {
     const composer = getComposer();
     if (!composer || composer === boundComposer) return;
 
@@ -108,15 +116,15 @@
     }, true);
   }
 
-  function loadSignature() {
-    chrome.storage.sync.get(['signature'], (result) => {
+  function loadSignature(): void {
+    extensionChrome.storage.sync.get(['signature'], (result) => {
       signature = typeof result.signature === 'string' ? result.signature.trim() : '';
       lastProcessedText = null;
       applySignature();
     });
   }
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
+  extensionChrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'sync' || !changes.signature) return;
 
     signature = typeof changes.signature.newValue === 'string'
@@ -126,18 +134,12 @@
     lastProcessedText = null;
   });
 
-  function initialize() {
+  function initialize(): void {
     loadSignature();
     bindComposer();
 
-    const observer = new MutationObserver(() => {
-      bindComposer();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    const observer = new MutationObserver(bindComposer);
+    observer.observe(document.body, { childList: true, subtree: true });
 
     document.addEventListener('focusin', (event) => {
       if (event.target instanceof Element && event.target.closest('footer div[role="textbox"]')) {
