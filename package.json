@@ -1,11 +1,16 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "assinae",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
+  "description": "Extensão Chrome Assinae para adicionar uma assinatura personalizada às mensagens do WhatsApp Web.",
+  "author": "Anderson Bernardo de Souza",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:extension",
+    "build:extension": "node scripts/build-extension.mjs",
+    "package:extension": "node scripts/package-extension.mjs",
+    "typecheck:extension": "tsc -p tsconfig.extension.json --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
   },
