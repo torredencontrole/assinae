@@ -1,84 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>AssinaWhats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assinae</title>
   <style>
-    body {
-      width: 300px;
-      padding: 16px;
+    :root {
+      color-scheme: light;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f5f5f7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      padding: 14px;
       margin: 0;
+      background: #f4f5f7;
+      color: #202124;
     }
 
     .container {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 18px;
+      background: #fff;
+      border: 1px solid #e4e6e8;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
     }
 
     .header {
+      margin-bottom: 18px;
       text-align: center;
-      margin-bottom: 16px;
     }
 
     .logo {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
+      color: #202124;
+      font-size: 20px;
+      font-weight: 700;
       text-decoration: none;
     }
 
+    .subtitle {
+      margin: 5px 0 0;
+      color: #6b7280;
+      font-size: 12px;
+    }
+
     .input-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #333;
-      font-weight: 500;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     textarea {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      min-height: 88px;
+      padding: 10px;
+      border: 1px solid #d6d9dd;
+      border-radius: 9px;
+      outline: none;
+      background: #fff;
+      color: #202124;
+      font: inherit;
       font-size: 14px;
+      line-height: 1.4;
       resize: vertical;
-      min-height: 80px;
-      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    textarea:focus {
+      border-color: #7c83fd;
+      box-shadow: 0 0 0 3px rgba(124, 131, 253, 0.14);
+    }
+
+    .counter {
+      margin-top: 5px;
+      color: #7a7f87;
+      font-size: 11px;
+      text-align: right;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background: #007AFF;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 9px;
+      background: #2563eb;
+      color: #fff;
       cursor: pointer;
-      transition: background-color 0.2s;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color 0.15s, transform 0.05s;
     }
 
     button:hover {
-      background: #0066CC;
+      background: #1d4ed8;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .status {
+      min-height: 17px;
+      margin: 9px 0 0;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .status[data-type="success"] {
+      color: #15803d;
+    }
+
+    .status[data-type="error"] {
+      color: #b91c1c;
     }
 
     .help {
-      margin-top: 12px;
+      margin-top: 14px;
       text-align: center;
       font-size: 12px;
     }
 
     .help a {
-      color: #007AFF;
+      color: #2563eb;
       text-decoration: none;
     }
 
@@ -88,24 +142,28 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <a href="https://vendedor.club" target="_blank" class="logo">AssinaWhats by vendedor.club</a>
-    </div>
-    
+  <main class="container">
+    <header class="header">
+      <a href="https://vendedor.club" target="_blank" rel="noopener noreferrer" class="logo">Assinae</a>
+      <p class="subtitle">Assinatura automática no WhatsApp Web</p>
+    </header>
+
     <div class="input-group">
-      <label for="signature">Sua assinatura:</label>
-      <textarea id="signature" placeholder="Digite sua assinatura aqui..."></textarea>
+      <label for="signature">Sua assinatura</label>
+      <textarea id="signature" maxlength="300" placeholder="Digite sua assinatura aqui..." autocomplete="off"></textarea>
+      <div class="counter" id="counter">0/300</div>
     </div>
-    
-    <button id="save">Salvar Assinatura</button>
-    
+
+    <button id="save" type="button">Salvar Assinatura</button>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+
     <div class="help">
-      <a href="https://api.whatsapp.com/send?phone=5532999508293&text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20AssinaWhats" target="_blank">
+      <a href="https://api.whatsapp.com/send?phone=5569993314445&amp;text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20Assinae" target="_blank" rel="noopener noreferrer">
         Precisa de ajuda? Clique aqui
       </a>
     </div>
-  </div>
-  <script src="popup.js"></script>
+  </main>
+
+  <script src="src/popup.js"></script>
 </body>
 </html>
