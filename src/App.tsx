@@ -1,10 +1,11 @@
-import React from 'react';
-
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <p>Start prompting (or editing) to see magic happen :)</p>
-    </div>
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <section className="text-center">
+        <h1 className="text-2xl font-semibold">Assinae</h1>
+        <p className="mt-2 text-gray-600">Painel de desenvolvimento da extensão.</p>
+      </section>
+    </main>
   );
 }
 
