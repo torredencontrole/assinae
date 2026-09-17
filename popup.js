@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signatureInput = document.getElementById('signature');
   const saveButton = document.getElementById('save');
   const status = document.getElementById('status');
+  const counter = document.getElementById('counter');
 
   const MAX_SIGNATURE_LENGTH = 300;
 
@@ -10,9 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     status.dataset.type = type;
   }
 
+  function updateCounter() {
+    counter.textContent = `${signatureInput.value.length}/${MAX_SIGNATURE_LENGTH}`;
+  }
+
   chrome.storage.sync.get(['signature'], (result) => {
     if (typeof result.signature === 'string') {
-      signatureInput.value = result.signature;
+      signatureInput.value = result.signature.slice(0, MAX_SIGNATURE_LENGTH);
+      updateCounter();
     }
   });
 
@@ -21,9 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
       signatureInput.value = signatureInput.value.slice(0, MAX_SIGNATURE_LENGTH);
     }
 
+    updateCounter();
     status.textContent = '';
     status.dataset.type = '';
   });
+
+  updateCounter();
 
   saveButton.addEventListener('click', () => {
     const signature = signatureInput.value.trim();
