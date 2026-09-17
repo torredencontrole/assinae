@@ -4,15 +4,15 @@
 
 ### Manifesto
 
-O projeto já utiliza Manifest V3. O script de conteúdo é carregado somente no WhatsApp Web e o popup é definido como `popup.html`.
+O projeto utiliza Manifest V3. O script de conteúdo é carregado somente no WhatsApp Web e o popup é definido como `popup.html`.
 
 ### Configuração
 
-`popup.js` lê e grava a chave `signature` em `chrome.storage.sync`.
+`popup.js` lê e grava a chave `signature` em `chrome.storage.sync` no modo de compatibilidade. A fonte moderna equivalente está em `src/popup.ts`.
 
 ### Aplicação da assinatura
 
-`content.js` localiza o campo de composição do WhatsApp Web e adiciona a assinatura no formato:
+`content.js` é mantido como compatibilidade para carregamento direto. A fonte moderna está em `src/content.ts` e preserva o mesmo comportamento: localizar o campo de composição do WhatsApp Web e adicionar a assinatura no formato:
 
 ```text
 *assinatura*
@@ -21,15 +21,15 @@ mensagem
 
 A implementação original verificava o DOM continuamente por meio de chamadas recursivas a cada 200 ms.
 
-## 2. Problemas encontrados
+## 2. Problemas encontrados e tratamento
 
 ### Alto impacto de manutenção
 
-A lógica original dependia de seletores específicos do DOM do WhatsApp Web. Alterações do WhatsApp podem exigir atualização do seletor.
+A lógica depende de seletores específicos do DOM do WhatsApp Web. Alterações do WhatsApp podem exigir atualização do seletor.
 
 ### Desempenho
 
-O `setTimeout` recursivo de 200 ms fazia leituras do DOM e consultas ao `chrome.storage.sync` continuamente. Isso foi substituído por cache da assinatura, eventos de entrada e `MutationObserver`.
+O `setTimeout` recursivo de 200 ms fazia leituras do DOM continuamente. Isso foi substituído por cache da assinatura, eventos de entrada e `MutationObserver`.
 
 ### Permissões
 
@@ -45,55 +45,61 @@ A assinatura não tinha limite explícito. Foi adicionado limite de 300 caracter
 
 ### Identidade da extensão
 
-O campo `key` existente foi preservado nesta etapa para reduzir o risco de mudança de identidade/ID durante a migração. A documentação deixa explícito que esse valor não é um segredo.
+O campo `key` existente foi preservado para reduzir o risco de mudança de identidade/ID durante a migração. A documentação deixa explícito que esse valor não é um segredo.
 
-### Build
+### Linguagem e build
 
-Há uma base Vite/React/TypeScript no projeto, porém o fluxo atual da extensão usa os arquivos diretamente na raiz. Não foi feita uma migração automática para Vite porque isso poderia quebrar a extensão existente. Essa integração será uma etapa separada, depois dos testes funcionais.
+A primeira estabilização manteve JavaScript na raiz para evitar impacto no fluxo funcional. A etapa atual adiciona TypeScript como fonte moderna para o content script e o popup, com `tsconfig.extension.json` e `scripts/build-extension.mjs` para gerar uma versão pronta em `dist/`.
 
-## 3. Alterações da versão 1.1.0
+Essa estratégia permite testar o novo código sem remover imediatamente o caminho de compatibilidade que já funciona.
+
+## 3. Alterações da modernização
 
 - Nome da extensão padronizado para Assinae.
+- Referências de identidade antiga `AssinaWhats` tratadas como legado e não utilizadas na nova arquitetura.
 - Manifest V3 mantido.
 - `activeTab` removido.
-- `update_url` removido do manifesto, pois não há ainda um processo de publicação/atualização definido na Chrome Web Store.
+- `update_url` removido do manifesto.
 - `run_at: document_idle` definido explicitamente.
 - Polling recursivo de 200 ms removido.
 - Cache da assinatura adicionado.
 - `chrome.storage.onChanged` adicionado para refletir mudanças sem recarregar a página.
-- Observação de mudanças do DOM e eventos do compositor adicionados para lidar melhor com o comportamento de SPA do WhatsApp Web.
+- Observação de mudanças do DOM e eventos do compositor adicionados.
 - Logs que poderiam expor a assinatura removidos.
 - Limite de 300 caracteres adicionado.
 - Feedback de sucesso/erro adicionado ao popup.
 - Links externos endurecidos com `noopener noreferrer`.
-- README e política de segurança adicionados.
+- Fonte TypeScript adicionada para `content.ts` e `popup.ts`.
+- Pipeline de build da extensão adicionada.
+- Branding genérico do template Vite removido.
 
 ## 4. O que não foi alterado propositalmente
 
 - O formato da assinatura.
 - A chave `signature` do armazenamento.
-- O uso de `chrome.storage.sync` nesta primeira etapa.
-- Os arquivos de backup existentes.
-- A base Vite/React/TypeScript.
+- O uso de `chrome.storage.sync` nesta etapa.
+- A identidade/ID da extensão.
 - O mecanismo de inserção baseado no DOM do WhatsApp Web.
-
-Essas decisões reduzem o risco de uma mudança estrutural quebrar o comportamento que já funcionava.
+- Os arquivos JavaScript de compatibilidade usados no carregamento direto.
 
 ## 5. Plano de testes
 
-1. Carregar a pasta como extensão descompactada.
-2. Configurar uma assinatura simples.
-3. Abrir uma conversa no WhatsApp Web.
-4. Digitar uma mensagem curta e verificar a assinatura.
-5. Editar uma mensagem antes do envio.
-6. Trocar de conversa sem recarregar o WhatsApp.
-7. Recarregar o WhatsApp Web.
-8. Reabrir o popup e confirmar a persistência da assinatura.
-9. Alterar a assinatura com o WhatsApp aberto e verificar a atualização.
-10. Testar assinatura vazia.
-11. Testar assinatura com caracteres acentuados, emojis e quebras de linha.
-12. Testar assinatura próxima do limite de 300 caracteres.
+1. Executar `npm install`.
+2. Executar `npm run typecheck:extension`.
+3. Executar `npm run build`.
+4. Carregar a pasta `dist` como extensão descompactada.
+5. Configurar uma assinatura simples.
+6. Abrir uma conversa no WhatsApp Web.
+7. Digitar uma mensagem curta e verificar a assinatura.
+8. Editar uma mensagem antes do envio.
+9. Trocar de conversa sem recarregar o WhatsApp.
+10. Recarregar o WhatsApp Web.
+11. Reabrir o popup e confirmar a persistência da assinatura.
+12. Alterar a assinatura com o WhatsApp aberto e verificar a atualização.
+13. Testar assinatura vazia.
+14. Testar assinatura com caracteres acentuados, emojis e quebras de linha.
+15. Testar assinatura próxima do limite de 300 caracteres.
 
-## 6. Próxima etapa após os testes
+## 6. Próxima etapa
 
-Somente depois de validar o fluxo acima, definir o empacotamento Vite/React, testes automatizados e uma arquitetura de distribuição/publicação. A prioridade é preservar o funcionamento atual antes de introduzir novas dependências ou APIs.
+Depois da validação funcional do build TypeScript, a próxima evolução pode remover gradualmente os arquivos JavaScript de compatibilidade e reduzir a dependência da base React/Vite que não participa do runtime da extensão.
