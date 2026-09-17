@@ -7,8 +7,10 @@ const execFileAsync = promisify(execFile);
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 
-const npmCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-await execFileAsync(npmCommand, ['tsc', '-p', 'tsconfig.extension.json']);
+// Use the local TypeScript compiler directly instead of spawning npx.
+// This avoids Windows spawn EINVAL issues with npx.cmd on some Node 22 setups.
+const tscPath = 'node_modules/typescript/bin/tsc';
+await execFileAsync(process.execPath, [tscPath, '-p', 'tsconfig.extension.json']);
 
 const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
 
