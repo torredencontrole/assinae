@@ -1,0 +1,47 @@
+name: Assinae Extension CI
+
+on:
+  push:
+    branches:
+      - main
+      - improvements/security-and-stability
+      - improvements/typescript-modernization
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-extension:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck extension
+        run: npm run typecheck:extension
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Package extension
+        run: npm run package:extension
+
+      - name: Validate package contents
+        run: |
+          test -f release/assinae-v1.1.0.zip
+          unzip -l release/assinae-v1.1.0.zip
+          unzip -l release/assinae-v1.1.0.zip | grep -q 'manifest.json'
+          unzip -l release/assinae-v1.1.0.zip | grep -q 'popup.html'
+          unzip -l release/assinae-v1.1.0.zip | grep -q 'src/content.js'
+          unzip -l release/assinae-v1.1.0.zip | grep -q 'src/popup.js'
