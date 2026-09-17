@@ -1,11 +1,13 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "assinae",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:extension",
+    "build:extension": "node scripts/build-extension.mjs",
+    "typecheck:extension": "tsc -p tsconfig.extension.json --noEmit",
     "lint": "eslint .",
     "preview": "vite preview"
   },
