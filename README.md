@@ -10,49 +10,51 @@ Extensão para Google Chrome que adiciona uma assinatura personalizada às mensa
 - A assinatura é aplicada automaticamente ao campo de mensagem.
 - O processamento do WhatsApp usa eventos e `MutationObserver`, sem polling recursivo a cada 200 ms.
 - O popup valida o tamanho da assinatura e informa o resultado do salvamento.
-- A nova base de código utiliza TypeScript para o content script e o popup.
+- A base de código da extensão utiliza TypeScript como fonte para o content script e o popup.
 - O projeto possui um build dedicado que gera uma versão pronta da extensão em `dist/`.
 
 ## Instalação para desenvolvimento
 
 1. Baixe ou clone este repositório.
-2. Abra `chrome://extensions` no Google Chrome.
-3. Ative **Modo do desenvolvedor**.
-4. Clique em **Carregar sem compactação**.
-5. Para testar rapidamente sem build, selecione a pasta raiz do projeto, que contém `manifest.json`.
-6. Para testar o build moderno, execute `npm install` e depois `npm run build`; em seguida carregue a pasta `dist`.
-7. Abra o WhatsApp Web e recarregue a página.
-8. Clique no ícone da extensão e configure a assinatura.
+2. Execute `npm install`.
+3. Execute `npm run build`.
+4. Abra `chrome://extensions` no Google Chrome.
+5. Ative **Modo do desenvolvedor**.
+6. Clique em **Carregar sem compactação**.
+7. Selecione a pasta `dist` gerada pelo build.
+8. Abra o WhatsApp Web e recarregue a página.
+9. Clique no ícone da extensão e configure a assinatura.
+
+A pasta raiz do projeto contém os arquivos-fonte e de build. A versão executável da extensão é a pasta `dist`.
 
 ## Desenvolvimento
 
-A extensão mantém os arquivos JavaScript da raiz como caminho de compatibilidade para o carregamento direto durante o desenvolvimento. A fonte moderna fica em TypeScript:
+A extensão utiliza TypeScript como fonte principal:
 
 - `src/content.ts`: fonte do content script.
 - `src/popup.ts`: fonte da interface e persistência da assinatura.
 - `tsconfig.extension.json`: configuração TypeScript específica da extensão.
 - `scripts/build-extension.mjs`: gera a extensão pronta em `dist/`.
+- `scripts/package-extension.mjs`: gera o pacote ZIP de distribuição.
 
 Comandos principais:
 
 ```bash
 npm run typecheck:extension
 npm run build
+npm run package:extension
 ```
 
-O build compila os arquivos TypeScript e copia o manifesto, popup e ícones para `dist/`, sem alterar o comportamento funcional da versão de desenvolvimento.
+O build compila os arquivos TypeScript e copia o manifesto, popup e ícones para `dist/`.
 
 ## Estrutura principal
 
 - `manifest.json`: configuração da extensão e permissões.
-- `content.js`: compatibilidade com o carregamento direto atual.
 - `popup.html`: interface de configuração.
-- `popup.js`: compatibilidade com o carregamento direto atual.
 - `src/content.ts`: implementação TypeScript do content script.
 - `src/popup.ts`: implementação TypeScript do popup.
 - `icons/`: ícones da extensão.
 - `src/`: base React/Vite mantida para evolução futura da interface.
-- `_metadata/`: arquivos de metadados existentes no projeto original.
 
 ## Segurança e permissões
 
