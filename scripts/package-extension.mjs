@@ -31,7 +31,7 @@ if (platform() === 'win32') {
     command,
   ]);
 } else {
-  await execFileAsync('zip', ['-r', outputFile, '.'], { cwd: 'dist' });
+  await execFileAsync('zip', ['-r', `../${outputFile}`, '.'], { cwd: 'dist' });
 }
 
 console.log(`Assinae: pacote criado em ./${outputFile}`);
