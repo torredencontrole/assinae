@@ -1,12 +1,9 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { createWriteStream } from 'node:fs';
+import { mkdir, readFile, rm } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { createRequire } from 'node:module';
+import { platform } from 'node:os';
 
 const execFileAsync = promisify(execFile);
-const require = createRequire(import.meta.url);
-const archiver = require('archiver');
 
 const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
 const version = packageJson.version;
@@ -25,18 +22,16 @@ if (manifest.version !== version) {
   );
 }
 
-const output = createWriteStream(outputFile);
-const archive = archiver('zip', { zlib: { level: 9 } });
-
-const closePromise = new Promise((resolve, reject) => {
-  output.on('close', resolve);
-  output.on('error', reject);
-  archive.on('error', reject);
-});
-
-archive.pipe(output);
-archive.directory('dist/', false);
-await archive.finalize();
-await closePromise;
+if (platform() === 'win32') {
+  const command = `Compress-Archive -Path 'dist\\*' -DestinationPath '${outputFile}' -Force`;
+  await execFileAsync('powershell.exe', [
+    '-NoProfile',
+    '-NonInteractive',
+    '-Command',
+    command,
+  ]);
+} else {
+  await execFileAsync('zip', ['-r', outputFile, '.'], { cwd: 'dist' });
+}
 
 console.log(`Assinae: pacote criado em ./${outputFile}`);
