@@ -62,7 +62,7 @@ A extensão usa somente a permissão `storage` no manifesto. A injeção do scri
 
 A assinatura continua em `chrome.storage.sync` nesta etapa para evitar uma alteração funcional brusca. Como o Chrome pode sincronizar esse armazenamento entre navegadores do mesmo usuário, não use a extensão para armazenar segredos, senhas, tokens ou informações que não devam ser sincronizadas. Consulte `SECURITY.md` para o plano de endurecimento futuro.
 
-O campo `key` do manifesto foi mantido nesta versão para preservar a identidade/ID existente da extensão durante a migração. Essa chave não deve ser tratada como um segredo.
+O manifesto não inclui uma chave pública fixa: a chave histórica presente no projeto estava inválida para o formato exigido pelo Chrome e impedia o carregamento da extensão como versão sem compactação.
 
 ## Identidade
 
