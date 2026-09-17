@@ -39,9 +39,10 @@ jobs:
 
       - name: Validate package contents
         run: |
-          test -f release/assinae-v1.1.0.zip
-          unzip -l release/assinae-v1.1.0.zip
-          unzip -l release/assinae-v1.1.0.zip | grep -q 'manifest.json'
-          unzip -l release/assinae-v1.1.0.zip | grep -q 'popup.html'
-          unzip -l release/assinae-v1.1.0.zip | grep -q 'src/content.js'
-          unzip -l release/assinae-v1.1.0.zip | grep -q 'src/popup.js'
+          package_file=$(find release -maxdepth 1 -type f -name 'assinae-v*.zip' | head -n 1)
+          test -n "$package_file"
+          unzip -l "$package_file"
+          unzip -l "$package_file" | grep -q 'manifest.json'
+          unzip -l "$package_file" | grep -q 'popup.html'
+          unzip -l "$package_file" | grep -q 'src/content.js'
+          unzip -l "$package_file" | grep -q 'src/popup.js'
